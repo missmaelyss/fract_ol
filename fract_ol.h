@@ -6,7 +6,7 @@
 /*   By: marnaud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/06 17:42:31 by marnaud           #+#    #+#             */
-/*   Updated: 2017/02/14 14:24:39 by marnaud          ###   ########.fr       */
+/*   Updated: 2017/02/16 17:35:26 by marnaud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ typedef struct	s_type
 	double	y_min;
 	double	y_max;
 	int		nb_i;
-	int		zoom;
+	double		zoom;
 }				t_type;
 
 typedef	struct	s_color
