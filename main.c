@@ -6,7 +6,7 @@
 /*   By: marnaud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/06 17:38:38 by marnaud           #+#    #+#             */
-/*   Updated: 2017/02/14 14:35:13 by marnaud          ###   ########.fr       */
+/*   Updated: 2017/02/16 16:44:15 by marnaud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ t_cpl	ft_suite(t_cpl z, t_cpl c)
 	return (new_z);
 }
 
-void	ft_pf(t_env *ptr)
+void	ft_pf(t_env *ptr, int x, int y)
 {
 	t_csr cursor;
 	t_cpl z;
@@ -38,14 +38,14 @@ void	ft_pf(t_env *ptr)
 	int i;
 
 	cursor.y = 0;
-	ptr->img = mlx_new_image(ptr->mlx, ptr->img_height, ptr->img_width);
-	while (cursor.y < ptr->img_height)
+	ptr->img = mlx_new_image(ptr->mlx, 900, 900);
+	while (cursor.y < 900)
 	{
 		cursor.x = 0;
-		while (cursor.x < ptr->img_height)
+		while (cursor.x < 900)
 		{
-			c.a = cursor.x / (ptr->img_height / (ptr->type.x_max - ptr->type.x_min)) + ptr->type.x_min;
-			c.b = cursor.y / (ptr->img_width / (ptr->type.y_max - ptr->type.y_min)) + ptr->type.y_min;
+			c.a = cursor.x / (900 / (ptr->type.x_max - ptr->type.x_min)) + ptr->type.x_min;
+			c.b = cursor.y / (900 / (ptr->type.y_max - ptr->type.y_min)) + ptr->type.y_min;
 			z.a = 0;
 			z.b = 0;
 			i = 0;
@@ -54,13 +54,7 @@ void	ft_pf(t_env *ptr)
 				z = ft_suite(z, c);
 				i += 1;
 			}
-	/*		if (i == ptr->type.nb_i)
-			{
-				color.b = 0;
-				color.g = 0;
-				color.r = 0;
-			}
-	*/		if (i != ptr->type.nb_i)
+			if (i != ptr->type.nb_i)
 			{
 				color.b = 20 + i*10;
 				color.g = 20;
@@ -71,51 +65,72 @@ void	ft_pf(t_env *ptr)
 		}
 		cursor.y += 1;
 	}
-	mlx_put_image_to_window(ptr->mlx, ptr->win, ptr->img, ptr->img_x, ptr->img_y);
+	mlx_put_image_to_window(ptr->mlx, ptr->win, ptr->img, 0, 0);
 }
 
 int		ft_esc(int k, t_env	*ptr)
 {
 	if (k == 53)
 		exit(0);
+	return (1);
+}
+
+int		ft_zoom(int k, int x, int y, t_env *ptr)
+{
+	double sto;
+
 	mlx_clear_window(ptr->mlx, ptr->win);
-	if (k == 124)
-	{
-		ptr->img_x += 2;
-		mlx_put_image_to_window(ptr->mlx, ptr->win, ptr->img, ptr->img_x, ptr->img_y);
-	}
-	if (k == 123)
-	{
-		ptr->img_x -= 2;
-		mlx_put_image_to_window(ptr->mlx, ptr->win, ptr->img, ptr->img_x, ptr->img_y);
-	}
-	if (k == 126)
-	{
-		ptr->img_y -= 2;
-		mlx_put_image_to_window(ptr->mlx, ptr->win, ptr->img, ptr->img_x, ptr->img_y);
-	}
-	if (k == 125)
-	{
-		ptr->img_y += 2;
-		mlx_put_image_to_window(ptr->mlx, ptr->win, ptr->img, ptr->img_x, ptr->img_y);
-	}
 	if (k == 4)
 	{
-		ptr->type.x_min *= 0.9;
-		ptr->type.x_max *= 0.9;
-		ptr->type.y_min *= 0.9;
-		ptr->type.y_max *= 0.9;
-		ptr->type.nb_i += 1;
-		mlx_destroy_image(ptr->mlx, ptr->img);
-		ft_pf(ptr);
+		printf("Avant\nx = %d, y = %d\nintervalle_x = %f, intervalle_y = %f\n\n", x, y, ptr->type.x_max - ptr->type.x_min, ptr->type.y_max - ptr->type.y_min);
+		ptr->type.zoom += 3;
+		ptr->type.x_min = ptr->type.zoom * (-2.1) / 100;
+		ptr->type.x_max = ptr->type.zoom * (0.6) / 100;
+		ptr->type.y_min = ptr->type.zoom * (-1.2) / 100;
+		ptr->type.y_max = ptr->type.zoom * (1.2) / 100;
+	
+		printf("Apres\nx = %d, y = %d\nintervalle_x = %f, intervalle_y = %f\n\n", x, y, ptr->type.x_max - ptr->type.x_min, ptr->type.y_max - ptr->type.y_min);
+	/*	ptr->type.x_min += ((x - 450) * 100 / 900) * (ptr->type.x_max - ptr->type.x_min) / 100;
+		ptr->type.x_max += ((x - 450) * 100 / 900) * (ptr->type.x_max - ptr->type.x_min) / 100;
+		ptr->type.y_min += ((y - 450) * 100 / 900) * (ptr->type.x_max - ptr->type.x_min) / 100;
+		ptr->type.y_max += ((y - 450) * 100 / 900) * (ptr->type.x_max - ptr->type.x_min) / 100;
+	*/	if (ptr->type.nb_i > 20)
+			ptr->type.nb_i--;
+		ft_pf(ptr, x, y);
+	}
+	if (k == 1)
+	{
+		printf("x_min = %f, x_max = %f, x = %d, y = %d\nnew x_max = %f\n",ptr->type.x_min, ptr->type.x_max, x, y, ptr->type.x_max * (x + 450) / 900);
+		sto = ptr->type.x_max;
+		ptr->type.x_max = ptr->type.x_max * (x - 450) / 900;
+		ptr->type.x_min -= sto - ptr->type.x_max;
+/*		printf("Avant\nx = %d, y = %d\nintervalle_x = %f, intervalle_y = %f\n\n", x, y, ptr->type.x_max - ptr->type.x_min, ptr->type.y_max - ptr->type.y_min);
+		ptr->type.zoom -= 3;
+		ptr->type.x_min = ptr->type.zoom * (-2.1) / 100;
+		ptr->type.x_max = ptr->type.zoom * (0.6) / 100;
+		ptr->type.y_min = ptr->type.zoom * (-1.2) / 100;
+		ptr->type.y_max = ptr->type.zoom * (1.2) / 100;
+		printf("Apres\nx = %d, y = %d\nintervalle_x = %f, intervalle_y = %f\n\n", x, y, ptr->type.x_max - ptr->type.x_min, ptr->type.y_max - ptr->type.y_min);
+		
+*/		//	printf("%f\n", ((x - 450) * 100 / 900) * (ptr->type.x_max - ptr->type.x_min) / 100);
+/*	//	ptr->type.x_min += ((x - 450) * 100 / 900) * (ptr->type.x_max - ptr->type.x_min) / 100;
+		ptr->type.x_min += (450 - x) / (900 / (ptr->type.x_max - ptr->type.x_min));
+	//	ptr->type.x_max += ((x - 450) * 100 / 900) * (ptr->type.x_max - ptr->type.x_min) / 100;
+		ptr->type.x_max += (450 - x) / (900 / (ptr->type.x_max - ptr->type.x_min));
+	//	ptr->type.y_min += ((y - 450) * 100 / 900) * (ptr->type.x_max - ptr->type.x_min) / 100;
+		ptr->type.y_min += (450 - x) / (900 / (ptr->type.x_max - ptr->type.x_min));
+	//	ptr->type.y_max += ((y - 450) * 100 / 900) * (ptr->type.x_max - ptr->type.x_min) / 100;
+		ptr->type.y_max += (450 - x) / (900 / (ptr->type.x_max - ptr->type.x_min));
+*/		ptr->type.nb_i++;
+		ft_pf(ptr, x, y);
 	}
 	return (1);
 }
 
 int		ft_event(t_env *ptr)
 {
-//	mlx_key_hook(ptr->win, ft_esc, ptr);
-	mlx_mouse_hook(ptr->win, ft_esc, ptr);
+	mlx_key_hook(ptr->win, ft_esc, ptr);
+	mlx_mouse_hook(ptr->win, ft_zoom, ptr);
 	return (1);
 }
 
@@ -133,13 +148,10 @@ int 	main(int ac, char **av)
 	ptr.type.x_max = 0.6;
 	ptr.type.y_min = -1.2;
 	ptr.type.y_max = 1.2;
-	ptr.type.nb_i = 30;
-	ptr.img_x = 0;
-	ptr.img_y = 0;
-	ptr.img_height = 1200;
-	ptr.img_width = 1200;
+	ptr.type.nb_i = 50;
+	ptr.type.zoom = 100;
 
-	ft_pf(&ptr);
+	ft_pf(&ptr, 0, 0);
 	ft_event(&ptr);
 	mlx_loop(ptr.mlx);
 	return (0);
