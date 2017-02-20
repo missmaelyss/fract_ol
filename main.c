@@ -6,7 +6,7 @@
 /*   By: marnaud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/06 17:38:38 by marnaud           #+#    #+#             */
-/*   Updated: 2017/02/16 17:47:37 by marnaud          ###   ########.fr       */
+/*   Updated: 2017/02/20 12:06:44 by marnaud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,31 +81,31 @@ int		ft_zoom(int k, int x, int y, t_env *ptr)
 	double sto_2;
 	double pc;
 	double pc_2;
-	
-	mlx_clear_window(ptr->mlx, ptr->win);
-	mlx_destroy_image(ptr->mlx, ptr->img);
-	sto = (ptr->type.x_max - ptr->type.x_min) / 900;
-	sto_2 = (ptr->type.y_max - ptr->type.y_min) / 900;
-	pc = 450 - x;
-	pc_2 = 450 - y;
-	printf("%f\n", sto);
-	printf("%f\n", sto_2);
-	printf("%f\n", pc);
-	printf("%f\n", pc_2);
+
+	if (k == 4 || k == 1 || k == 2)
+	{
+		mlx_clear_window(ptr->mlx, ptr->win);
+		mlx_destroy_image(ptr->mlx, ptr->img);
+		sto = (ptr->type.x_max - ptr->type.x_min) / 900;
+		sto_2 = (ptr->type.y_max - ptr->type.y_min) / 900;
+		pc = 450 - x;
+		pc_2 = 450 - y;
+	}
 	if (k == 4)
 	{
-		ptr->type.x_min = -2.1 - pc * sto;
-		ptr->type.x_max = 0.6 - pc * sto;
-		ptr->type.y_min = -1.2 - pc_2 * sto_2;
-		ptr->type.y_max = 1.2 - pc_2 * sto_2;
-	
-		ptr->type.zoom += 3;
-		ptr->type.x_min = ptr->type.zoom * (-2.1) / 100;
-		ptr->type.x_max = ptr->type.zoom * (0.6) / 100;
-		ptr->type.y_min = ptr->type.zoom * (-1.2) / 100;
-		ptr->type.y_max = ptr->type.zoom * (1.2) / 100;
-		
-	ft_pf(ptr, x, y);
+		ptr->type.x_min -=  pc * sto;
+		ptr->type.x_max -=  pc * sto;
+		ptr->type.y_min -=  pc_2 * sto_2;
+		ptr->type.y_max -=  pc_2 * sto_2;
+
+		ptr->type.x_min += 0.1 * 900 * sto;
+		ptr->type.x_max -= 0.1 * 900 * sto;
+		ptr->type.y_min += 0.1 * 900 * sto_2;
+		ptr->type.y_max -= 0.1 * 900 * sto_2;
+
+		ptr->type.nb_i++;
+
+		ft_pf(ptr, x, y);
 	}
 	if (k == 1)
 	{
@@ -114,20 +114,24 @@ int		ft_zoom(int k, int x, int y, t_env *ptr)
 		ptr->type.y_min -=  pc_2 * sto_2;
 		ptr->type.y_max -=  pc_2 * sto_2;
 	
-		ptr->type.zoom -= 3;
-		ptr->type.x_min *= ptr->type.zoom / 100;
-		ptr->type.x_max *= ptr->type.zoom / 100;
-		ptr->type.y_min *= ptr->type.zoom / 100;
-		ptr->type.y_max *= ptr->type.zoom / 100;
+		ptr->type.x_min -= 0.1 * 900 * sto;
+		ptr->type.x_max += 0.1 * 900 * sto;
+		ptr->type.y_min -= 0.1 * 900 * sto_2;
+		ptr->type.y_max += 0.1 * 900 * sto_2;
 	
-/*		ptr->type.zoom -= 3;
-		ptr->type.x_min *= (ptr->type.zoom) / 100;
-		ptr->type.x_max *= (ptr->type.zoom) / 100;
-		ptr->type.y_min *= (ptr->type.zoom) / 100;
-		ptr->type.y_max *= (ptr->type.zoom) / 100;
-	
+		ptr->type.nb_i--;
+
 		ft_pf(ptr, x, y);
-*/		ft_pf(ptr, x, y);
+	}
+	
+	if (k == 2)
+	{
+		ptr->type.x_min -=  pc * sto;
+		ptr->type.x_max -=  pc * sto;
+		ptr->type.y_min -=  pc_2 * sto_2;
+		ptr->type.y_max -=  pc_2 * sto_2;
+		
+		ft_pf(ptr, x, y);
 	}
 	return (1);
 }
