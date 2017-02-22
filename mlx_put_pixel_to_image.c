@@ -6,12 +6,11 @@
 /*   By: marnaud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/14 13:41:04 by marnaud           #+#    #+#             */
-/*   Updated: 2017/02/14 13:51:41 by marnaud          ###   ########.fr       */
+/*   Updated: 2017/02/21 11:05:44 by marnaud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fract_ol.h"
-#include <mlx.h>
 
 int	mlx_pixel_put_to_image(void *img, t_csr cursor, t_color color)
 {

@@ -6,160 +6,106 @@
 /*   By: marnaud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/06 17:38:38 by marnaud           #+#    #+#             */
-/*   Updated: 2017/02/20 12:06:44 by marnaud          ###   ########.fr       */
+/*   Updated: 2017/02/22 16:28:26 by marnaud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fract_ol.h"
-#include <stdio.h>
-double 	ft_module(t_cpl z)
-{
-	double	r;
-
-	r = z.a * z.a + z.b * z.b;
-	return (r);
-}
-
-t_cpl	ft_suite(t_cpl z, t_cpl c)
-{
-	t_cpl new_z;
-
-	new_z.a = z.a*z.a - z.b*z.b + c.a;
-	new_z.b = 2*z.a*z.b + c.b;
-	return (new_z);
-}
-
-void	ft_pf(t_env *ptr, int x, int y)
-{
-	t_csr cursor;
-	t_cpl z;
-	t_cpl c;
-	t_color color;
-	int i;
-
-	cursor.y = 0;
-	ptr->img = mlx_new_image(ptr->mlx, 900, 900);
-	while (cursor.y < 900)
-	{
-		cursor.x = 0;
-		while (cursor.x < 900)
-		{
-			c.a = cursor.x / (900 / (ptr->type.x_max - ptr->type.x_min)) + ptr->type.x_min;
-			c.b = cursor.y / (900 / (ptr->type.y_max - ptr->type.y_min)) + ptr->type.y_min;
-			z.a = 0;
-			z.b = 0;
-			i = 0;
-			while (ft_module(z) < 4 && i < ptr->type.nb_i)
-			{
-				z = ft_suite(z, c);
-				i += 1;
-			}
-			if (i != ptr->type.nb_i)
-			{
-				color.b = 20 + i*10;
-				color.g = 20;
-				color.r = 20;
-				mlx_pixel_put_to_image(ptr->img, cursor, color);
-			}
-			cursor.x += 1;
-		}
-		cursor.y += 1;
-	}
-	mlx_put_image_to_window(ptr->mlx, ptr->win, ptr->img, 0, 0);
-}
-
 int		ft_esc(int k, t_env	*ptr)
 {
+	if (k == 35)
+	{
+		ptr->type.pause = (ptr->type.pause + 1) % 2;
+//		mlx_do_key_autorepeatoff(ptr->mlx);
+	}
+	if (k == 78)
+	{
+		ptr->type.nb_i--;
+		if (ptr->type.name == 1)
+			mandelbrot(ptr);
+		if (ptr->type.name == 2)
+			julia(ptr, ptr->cursor.x, ptr->cursor.y);
+	}
+	if (k == 69)
+	{
+		ptr->type.nb_i++;
+		if (ptr->type.name == 1)
+			mandelbrot(ptr);
+		if (ptr->type.name == 2)
+			julia(ptr, ptr->cursor.x, ptr->cursor.y);
+	}
 	if (k == 53)
 		exit(0);
-	return (1);
-}
-
-int		ft_zoom(int k, int x, int y, t_env *ptr)
-{
-	double sto;
-	double sto_2;
-	double pc;
-	double pc_2;
-
-	if (k == 4 || k == 1 || k == 2)
-	{
-		mlx_clear_window(ptr->mlx, ptr->win);
-		mlx_destroy_image(ptr->mlx, ptr->img);
-		sto = (ptr->type.x_max - ptr->type.x_min) / 900;
-		sto_2 = (ptr->type.y_max - ptr->type.y_min) / 900;
-		pc = 450 - x;
-		pc_2 = 450 - y;
-	}
-	if (k == 4)
-	{
-		ptr->type.x_min -=  pc * sto;
-		ptr->type.x_max -=  pc * sto;
-		ptr->type.y_min -=  pc_2 * sto_2;
-		ptr->type.y_max -=  pc_2 * sto_2;
-
-		ptr->type.x_min += 0.1 * 900 * sto;
-		ptr->type.x_max -= 0.1 * 900 * sto;
-		ptr->type.y_min += 0.1 * 900 * sto_2;
-		ptr->type.y_max -= 0.1 * 900 * sto_2;
-
-		ptr->type.nb_i++;
-
-		ft_pf(ptr, x, y);
-	}
-	if (k == 1)
-	{
-		ptr->type.x_min -=  pc * sto;
-		ptr->type.x_max -=  pc * sto;
-		ptr->type.y_min -=  pc_2 * sto_2;
-		ptr->type.y_max -=  pc_2 * sto_2;
-	
-		ptr->type.x_min -= 0.1 * 900 * sto;
-		ptr->type.x_max += 0.1 * 900 * sto;
-		ptr->type.y_min -= 0.1 * 900 * sto_2;
-		ptr->type.y_max += 0.1 * 900 * sto_2;
-	
-		ptr->type.nb_i--;
-
-		ft_pf(ptr, x, y);
-	}
-	
-	if (k == 2)
-	{
-		ptr->type.x_min -=  pc * sto;
-		ptr->type.x_max -=  pc * sto;
-		ptr->type.y_min -=  pc_2 * sto_2;
-		ptr->type.y_max -=  pc_2 * sto_2;
-		
-		ft_pf(ptr, x, y);
-	}
 	return (1);
 }
 
 int		ft_event(t_env *ptr)
 {
 	mlx_key_hook(ptr->win, ft_esc, ptr);
+	
 	mlx_mouse_hook(ptr->win, ft_zoom, ptr);
+	if (ptr->type.name == 2)
+	{
+		mlx_do_key_autorepeaton(ptr->mlx);
+		mlx_hook(ptr->win, 6, (1L<<6), ft_follow_mouse, ptr);
+	}
 	return (1);
+}
+
+t_cpl	newCpl(double a, double b)
+{
+	t_cpl	new_cpl;
+
+	new_cpl.a = a;
+	new_cpl.b = b;
+	return (new_cpl);
+}
+
+
+void init_fractal(t_cpl pmin, t_cpl pmax, t_env *ptr, int fractal)
+{
+	ptr->type.x_min = pmin.a;
+	ptr->type.x_max = pmax.a;
+	ptr->type.y_min = pmin.b;
+	ptr->type.y_max = pmax.b;
+	ptr->type.name = fractal;
+	ptr->type.pause = 0;
+	ptr->type.PuissanceZoom = 0.2;
 }
 
 int 	main(int ac, char **av)
 {
 	t_env	ptr;
-	t_csr	cursor;
-	t_cpl	z;
-	t_cpl	c;
-	int		i;
 
 	ptr.mlx = mlx_init();
-	ptr.win = mlx_new_window(ptr.mlx, 900, 900, "test");
-	ptr.type.x_min = -2.1;
-	ptr.type.x_max = 0.6;
-	ptr.type.y_min = -1.2;
-	ptr.type.y_max = 1.2;
+	ptr.width = 600;
+	ptr.height = 600;
+	ptr.win = mlx_new_window(ptr.mlx, ptr.width, ptr.height, "test");
 	ptr.type.nb_i = 30;
-	ptr.type.zoom = 100;
-	ft_pf(&ptr, 0, 0);
+	ptr.cursor.x = 0;
+	ptr.cursor.y = 0;
+	if (ac != 2)
+		return (printf("error\n"));
+	if (ft_strcmp(av[1], "mandelbrot") == 0)
+	{
+		init_fractal(newCpl(-2.1, -1.2), newCpl(0.6, 1.2), &ptr, 1);
+/*		ptr.type.x_min = -2.1;
+		ptr.type.x_max = 0.6;
+		ptr.type.y_min = -1.2;
+		ptr.type.y_max = 1.2;
+		ptr.type.name = 1;*/
+		mandelbrot(&ptr);
+	}
+	if (ft_strcmp(av[1], "julia") == 0)
+	{
+		init_fractal(newCpl(-2, -2), newCpl(2, 2), &ptr, 2);
+/*		ptr.type.x_min = -2;
+		ptr.type.x_max = 2;
+		ptr.type.y_min = -2;
+		ptr.type.y_max = 2;
+		ptr.type.name = 2;*/
+		julia(&ptr, 0, 0);
+	}
 	ft_event(&ptr);
 	mlx_loop(ptr.mlx);
 	return (0);
