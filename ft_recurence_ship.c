@@ -1,24 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_follow_mouse.c                                  :+:      :+:    :+:   */
+/*   ft_recurence_ship.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marnaud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/02/21 15:18:19 by marnaud           #+#    #+#             */
-/*   Updated: 2017/02/23 12:26:41 by marnaud          ###   ########.fr       */
+/*   Created: 2017/02/23 14:08:48 by marnaud           #+#    #+#             */
+/*   Updated: 2017/02/23 15:01:13 by marnaud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fract_ol.h"
 
-int			ft_follow_mouse(int x, int y, t_env *ptr)
+t_cpl	ft_recurence_ship(t_cpl z, t_cpl c)
 {
-	if (ptr->type.pause == 0)
-	{
-		ptr->cursor.x = x;
-		ptr->cursor.y = y;
-		julia(ptr, ptr->cursor.x, ptr->cursor.y);
-	}
-	return (1);
+	t_cpl new_z;
+	
+	new_z.a = z.a * z.a - z.b * z.b + c.a;
+	new_z.b = 2 * (sqrt(z.a * z.a) * sqrt(z.b * z.b)) + c.b;
+	return (new_z);
 }

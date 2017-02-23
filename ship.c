@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   mandelbrot.c                                       :+:      :+:    :+:   */
+/*   ship.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marnaud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/02/21 11:05:22 by marnaud           #+#    #+#             */
-/*   Updated: 2017/02/23 15:17:34 by marnaud          ###   ########.fr       */
+/*   Created: 2017/02/23 15:00:11 by marnaud           #+#    #+#             */
+/*   Updated: 2017/02/23 15:09:39 by marnaud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fract_ol.h"
 
-void	mandelbrot(t_env *ptr)
+void	ship(t_env *ptr)
 {
 	t_csr		cursor;
 	t_cpl		z;
@@ -34,19 +34,24 @@ void	mandelbrot(t_env *ptr)
 			i = 0;
 			while (ft_module(z) < 4 && i < ptr->type.nb_i)
 			{
-				if (ptr->type.puissance == 2)
-					z = ft_recurence_mandelbrot(z, c);
-				else
-					z = ft_recurence_mandelbrot_cube(z, c);
+				z = ft_recurence_ship(z, c);
 				i += 1;
 			}
-			if (i != ptr->type.nb_i)
+			if (i == ptr->type.nb_i && ptr->type.cc == 1)
 			{
-				color.b = 20 + i * 10;
-				color.g = 20 + i * i;
-				color.r = 20 + i * 2;
+				color.b = 20 + (4 / ft_module(z)) * 2;
+				color.g = 20 + (4 / ft_module(z)) * 3;
+				color.r = 20 + (4 / ft_module(z)) * 4;
 				mlx_pixel_put_to_image(ptr->img, cursor, color);
 			}
+			if (i != ptr->type.nb_i && ptr->type.cc == 0)
+			{
+				color.b = 20 + i * 2;
+				color.g = 20 + i * 3;
+				color.r = 20 + i * 4;
+				mlx_pixel_put_to_image(ptr->img, cursor, color);
+			}
+			
 			cursor.x += 1;
 		}
 		cursor.y += 1;
