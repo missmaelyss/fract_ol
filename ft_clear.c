@@ -1,22 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_recurence_mandelbrot.c                          :+:      :+:    :+:   */
+/*   ft_clear.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marnaud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/02/21 11:04:00 by marnaud           #+#    #+#             */
-/*   Updated: 2017/02/27 13:23:20 by marnaud          ###   ########.fr       */
+/*   Created: 2017/02/27 12:56:02 by marnaud           #+#    #+#             */
+/*   Updated: 2017/02/27 12:57:22 by marnaud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fract_ol.h"
 
-t_cpl	ft_recurence_mandelbrot_cube(t_cpl z, t_cpl c)
+void		ft_clear(t_env *ptr)
 {
-	t_cpl new_z;
-
-	new_z.a = z.a * z.a * z.a - (3 * z.b * z.b * z.a) + c.a;
-	new_z.b = 3 * z.a * z.a * z.b - z.b * z.b * z.b + c.b;
-	return (new_z);
+	mlx_clear_window(ptr->mlx, ptr->win);
+	mlx_destroy_image(ptr->mlx, ptr->img);
 }

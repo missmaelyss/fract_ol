@@ -6,7 +6,7 @@
 /*   By: marnaud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2017/02/21 12:09:17 by marnaud           #+#    #+#             */
-/*   Updated: 2017/02/23 14:57:31 by marnaud          ###   ########.fr       */
+/*   Updated: 2017/02/27 12:56:24 by marnaud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,6 @@ void			increase_or_decrease_it(int i, t_env *ptr, t_cpl sto)
 		ptr->type.y_min -= 0.01 * ptr->height * sto.b;
 		ptr->type.y_max += 0.01 * ptr->height * sto.b;
 	}
-}
-
-static void		ft_clear(t_env *ptr)
-{
-	mlx_clear_window(ptr->mlx, ptr->win);
-	mlx_destroy_image(ptr->mlx, ptr->img);
 }
 
 /*

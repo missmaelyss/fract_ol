@@ -5,20 +5,45 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: marnaud <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/02/23 15:00:11 by marnaud           #+#    #+#             */
-/*   Updated: 2017/02/23 15:09:39 by marnaud          ###   ########.fr       */
+/*   Created: 2017/02/27 13:19:49 by marnaud           #+#    #+#             */
+/*   Updated: 2017/02/27 13:28:35 by marnaud          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fract_ol.h"
 
-void	ship(t_env *ptr)
+static t_img	recurence_thermes(t_csr cursor, t_env *ptr)
+{
+	t_img		img;
+	t_cpl		c;
+
+	c.a = cursor.x / (ptr->width / (ptr->type.x_max -
+				ptr->type.x_min)) + ptr->type.x_min;
+	c.b = cursor.y / (ptr->height / (ptr->type.y_max -
+				ptr->type.y_min)) + ptr->type.y_min;
+	img.z.a = 0;
+	img.z.b = 0;
+	img.i = 0;
+	while (ft_module(img.z) < 4 && img.i < ptr->type.nb_i)
+	{
+		if (ptr->type.puissance == 2)
+			img.z = ft_recurence_ship(img.z, c);
+		img.i += 1;
+	}
+	return (img);
+}
+
+static void		color_img(t_color color, int nb, t_env *ptr, t_csr cursor)
+{
+	ft_color(&color, nb, ptr);
+	mlx_pixel_put_to_image(ptr->img, cursor, color);
+}
+
+void			ship(t_env *ptr)
 {
 	t_csr		cursor;
-	t_cpl		z;
-	t_cpl		c;
 	t_color		color;
-	int			i;
+	t_img		img;
 
 	cursor.y = 0;
 	ptr->img = mlx_new_image(ptr->mlx, ptr->width, ptr->height);
@@ -27,31 +52,11 @@ void	ship(t_env *ptr)
 		cursor.x = 0;
 		while (cursor.x < ptr->width)
 		{
-			c.a = cursor.x / (ptr->width / (ptr->type.x_max - ptr->type.x_min)) + ptr->type.x_min;
-			c.b = cursor.y / (ptr->height / (ptr->type.y_max - ptr->type.y_min)) + ptr->type.y_min;
-			z.a = 0;
-			z.b = 0;
-			i = 0;
-			while (ft_module(z) < 4 && i < ptr->type.nb_i)
-			{
-				z = ft_recurence_ship(z, c);
-				i += 1;
-			}
-			if (i == ptr->type.nb_i && ptr->type.cc == 1)
-			{
-				color.b = 20 + (4 / ft_module(z)) * 2;
-				color.g = 20 + (4 / ft_module(z)) * 3;
-				color.r = 20 + (4 / ft_module(z)) * 4;
-				mlx_pixel_put_to_image(ptr->img, cursor, color);
-			}
-			if (i != ptr->type.nb_i && ptr->type.cc == 0)
-			{
-				color.b = 20 + i * 2;
-				color.g = 20 + i * 3;
-				color.r = 20 + i * 4;
-				mlx_pixel_put_to_image(ptr->img, cursor, color);
-			}
-			
+			img = recurence_thermes(cursor, ptr);
+			if (img.i != ptr->type.nb_i && ptr->type.cc == 1)
+				color_img(color, img.i * 5, ptr, cursor);
+			if (img.i == ptr->type.nb_i && ptr->type.cc == 0)
+				color_img(color, 4 / ft_module(img.z), ptr, cursor);
 			cursor.x += 1;
 		}
 		cursor.y += 1;
